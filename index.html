@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fa">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/all.min.css">
+  <style>
+    /* توصیه برای انیمیشن روان داخل WebView */
+    body,
+    .container,
+    .btn {
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+    }
+
+    /* جلوگیری از scroll اضافی */
+    html,
+    body {
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      /* scroll روان در WebView */
+    }
+  </style>
+</head>
+
+<body style="background: linear-gradient(165deg,#2b6bee ,#68e3bf);">
+  <script>
+    const hasPassword = localStorage.getItem("app_lock_password");
+    const hasPin = localStorage.getItem("app_lock_pin");
+
+    if (hasPassword || hasPin) {
+      if (sessionStorage.getItem("auth") !== "ok") {
+        window.location.href = "login.html";
+      }
+    }
+
+    // preload تصاویر یا آیکون‌ها برای smooth rendering
+    document.addEventListener("DOMContentLoaded", () => {
+      const imgs = document.querySelectorAll("img, i");
+      imgs.forEach(el => {
+        el.style.willChange = "transform, opacity";
+      });
+    });
+  </script>
+
+  <div class="container" id="main-menu">
+    <div style="display: flex;justify-content: center;align-items: center;">
+      <div style="display: flex; justify-content: center; align-items: center; 
+            padding: 4px; /* ضخامت حلقه */
+            border-radius: 50%; 
+            background: linear-gradient(135deg, #68e3bf, #2b6bee); 
+            width: fit-content; /* اندازه دیو فقط به اندازه عکس */
+            height: fit-content;">
+      <img style="width: 200px; height: 200px; border-radius: 50%; display: block;" src="logo.png" alt="logo">
+    </div>
+    </div>
+    <a href="pages/make.html" class="btn">
+      <i class="fa-solid fa-key"></i>
+      ساخت رمز
+    </a>
+    <a href="pages/savemenu.html" class="btn">
+      <i class="fa-solid fa-database"></i>
+      مدیریت رمزها
+    </a>
+    <a href="pages/setting.html" class="btn">
+      <i class="fa-solid fa-gear"></i>
+      تنظیمات
+    </a>
+    <!-- <a href="pages/about.html" class="btn">
+      <i class="fa-solid fa-question"></i>
+      درباره ما
+    </a> -->
+  </div>
+
+  <!-- بارگذاری فایل theme.js در انتهای صفحه -->
+  <script src="theme.js"></script>
+
+</body>
+
+</html>

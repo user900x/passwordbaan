@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ورود</title>
+<link rel="stylesheet" href="css/all.css"> <!-- فونت آسم -->
+<style>
+/* ======== Reset ======== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Tahoma, sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #1e293b;
+  color: white;
+  overflow: hidden; /* جلوگیری از اسکرول */
+  padding: 10px;
+}
+
+/* ======== Container ======== */
+.container {
+  width: 100%;
+  max-width: 350px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  border-radius: 15px;
+  padding: 25px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,.5);
+  transition: 0.3s;
+}
+
+/* ======== Input ======== */
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  margin-top: 15px;
+  font-size: 18px;
+  text-align: center;
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+/* ======== Buttons ======== */
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  background: #2563eb;
+  color: white;
+  transition: 0.3s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+button i {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+
+/* ======== Error / Locked ======== */
+.error {
+    min-height: 20px;
+  font-size: 14px;
+}
+
+.error { color: #f87171; }
+
+/* ======== Fingerprint Button ======== */
+.finger-btn {
+  background: linear-gradient(135deg, #3B82F6, #1d4ed8);
+  font-size: 22px;
+  justify-content: center;
+}
+
+/* ======== PIN Pad ======== */
+.pin-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.pin-pad button {
+  font-size: 20px;
+  padding: 15px;
+  border-radius: 10px;
+  background:#2563eb;
+  color: white;
+}
+
+#pinInput {
+  font-size: 24px;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+/* ======== Popup ======== */
+.popup{
+  position: fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  visibility:hidden;
+  opacity:0;
+  transition:.3s;
+}
+
+.popup.show{
+  visibility:visible;
+  opacity:1;
+}
+
+.popup-box{
+  background:white;
+  color:black;
+  padding:20px;
+  border-radius:15px;
+  width:85%;
+  max-width:300px;
+  text-align:center;
+}
+
+.popup-box button{
+  margin-top:15px;
+  padding:10px 20px;
+  border:none;
+  border-radius:10px;
+  background:#2563eb;
+  color:white;
+  cursor:pointer;
+}
+
+/* ======== Responsive ======== */
+@media(max-width:400px){
+  .container { padding: 15px; }
+  button { font-size: 16px; }
+  #pinInput { font-size: 20px; }
+  .pin-pad button { font-size: 18px; padding: 12px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ===== Password Login ===== -->
+<div class="container" id="password-login">
+    <h2>رمز ورود را وارد کنید</h2>
+    <input type="password" id="password" placeholder="رمز...">
+    <div class="error" id="errorText"></div>
+    <button onclick="checkPassword()">ورود</button>
+        <button class="finger-btn" onclick="fingerLogin()">
+        <i class="fa-solid fa-fingerprint"></i> ورود با اثر انگشت
+    </button>
+</div>
+
+<!-- ===== PIN Login ===== -->
+<div class="container" id="pin-login" style="display:none;">
+    <h2>پین را وارد کنید</h2>
+    <input type="password" id="pinInput" readonly placeholder="رمز...">
+    <div class="error" id="pinError"></div>
+    <div class="pin-pad">
+        <button onclick="pressNumber('1')">1</button>
+        <button onclick="pressNumber('2')">2</button>
+        <button onclick="pressNumber('3')">3</button>
+        <button onclick="pressNumber('4')">4</button>
+        <button onclick="pressNumber('5')">5</button>
+        <button onclick="pressNumber('6')">6</button>
+        <button onclick="pressNumber('7')">7</button>
+        <button onclick="pressNumber('8')">8</button>
+        <button onclick="pressNumber('9')">9</button>
+        <button onclick="clearPin()">⌫</button>
+        <button onclick="pressNumber('0')">0</button>
+        <button onclick="submitPin()">✔</button>
+    </div>
+    <button class="finger-btn" onclick="fingerLogin()">
+        <i class="fa-solid fa-fingerprint"></i> ورود با اثر انگشت
+    </button>
+
+</div>
+
+<!-- ===== Fingerprint Login ===== -->
+
+<!-- ===== Popup ===== -->
+<div class="popup" id="popup">
+  <div class="popup-box">
+    <div id="popupText"></div>
+    <button onclick="closePopup()">باشه</button>
+  </div>
+</div>
+
+<script>
+// ===== Popup =====
+function showPopup(text){
+  document.getElementById("popupText").innerText=text;
+  document.getElementById("popup").classList.add("show");
+}
+function closePopup(){
+  document.getElementById("popup").classList.remove("show");
+}
+
+// ===== LocalStorage check =====
+const passwordStored = JSON.parse(localStorage.getItem("app_lock_password"));
+const pinStored = JSON.parse(localStorage.getItem("app_lock_pin"));
+
+if(!passwordStored && !pinStored){
+    window.location.href="index.html";
+}
+
+if(sessionStorage.getItem("auth")==="ok"){
+    window.location.href="index.html";
+}
+
+let attempts=0;
+let lockUntil=0;
+
+// ===== Hash Function =====
+async function hashPassword(password,salt){
+    const enc=new TextEncoder();
+    const keyMaterial=await crypto.subtle.importKey(
+        "raw", enc.encode(password), {name:"PBKDF2"}, false, ["deriveBits"]
+    );
+    const derivedBits=await crypto.subtle.deriveBits(
+        {name:"PBKDF2", salt:salt, iterations:310000, hash:"SHA-256"},
+        keyMaterial, 256
+    );
+    return Array.from(new Uint8Array(derivedBits)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+// ===== Password Login =====
+async function checkPassword(){
+    const now = Date.now();
+    if(now < lockUntil){
+        document.getElementById("lockText").innerText="چند لحظه صبر کنید...";
+        return;
+    }
+
+    const stored = JSON.parse(localStorage.getItem("app_lock_password"));
+    if(!stored){
+        showPopup("رمز تنظیم نشده!");
+        return;
+    }
+
+    const inputPass = document.getElementById("password").value;
+    const saltArray = new Uint8Array(stored.salt.split(",").map(Number));
+    const inputHash = await hashPassword(inputPass, saltArray);
+
+    if(inputHash === stored.hash){
+        sessionStorage.setItem("auth","ok");
+        window.location.href="index.html";
+    }else{
+        attempts++;
+        document.getElementById("errorText").innerText = "رمز اشتباه است";
+        document.getElementById("password").value="";
+        if(attempts >= 5){
+            lockUntil = Date.now() + 15000;
+            attempts = 0;
+            document.getElementById("lockText").innerText="بیش از حد تلاش کردید. 15 ثانیه قفل شد.";
+        }
+    }
+}
+document.getElementById("password").addEventListener("keypress",function(e){
+    if(e.key==="Enter") checkPassword();
+});
+
+// ===== PIN Login =====
+let pin="";
+function pressNumber(num){
+    if(pin.length<6){
+        pin+=num;
+        document.getElementById("pinInput").value=pin;
+    }
+}
+function clearPin(){
+    pin=pin.slice(0,-1);
+    document.getElementById("pinInput").value=pin;
+}
+async function submitPin(){
+    if(!pinStored){ showPopup("PIN تنظیم نشده"); return; }
+    const saltArray=new Uint8Array(pinStored.salt.split(",").map(Number));
+    const inputHash=await hashPassword(pin,saltArray);
+    if(inputHash===pinStored.hash){
+        sessionStorage.setItem("auth","ok");
+        window.location.href="index.html";
+    }else{
+        document.getElementById("pinError").innerText="PIN اشتباه است";
+        pin="";
+        document.getElementById("pinInput").value="";
+    }
+}
+
+// ===== Show correct login =====
+window.onload=function(){
+    if(passwordStored){
+        document.getElementById("password-login").style.display="block";
+        document.getElementById("pin-login").style.display="none";
+    }else if(pinStored){
+        document.getElementById("password-login").style.display="none";
+        document.getElementById("pin-login").style.display="block";
+    }
+};
+
+// ===== Fingerprint =====
+function fingerLogin(){
+    if(window.Android){
+        Android.authenticateFingerprint();
+    }else{
+        showPopup("این قابلیت در دستگاه شما پشتیبانی نمیشود");
+    }
+}
+</script>
+
+</body>
+</html>

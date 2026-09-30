@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تنظیمات امنیتی</title>
+
+<style>
+:root{
+  --bg1:#0f172a;
+  --bg2:#1e293b;
+  --card:rgba(255,255,255,0.05);
+  --text:white;
+}
+
+body.light{
+  --bg1:#f1f5f9;
+  --bg2:#e2e8f0;
+  --card:white;
+  --text:#0f172a;
+}
+
+body{
+  margin:0;
+  font-family:tahoma;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
+  color:var(--text);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  padding:15px;
+  transition:.3s;
+  direction: rtl;
+}
+
+.container{
+  width:100%;
+  max-width:420px;
+  background:var(--card);
+  backdrop-filter:blur(15px);
+  padding:20px;
+  border-radius:20px;
+  box-shadow:0 10px 40px rgba(0,0,0,.4);
+  transition:.3s;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.section{
+  margin-top:20px;
+  padding:15px;
+  background:rgba(255,255,255,.05);
+  border-radius:15px;
+}
+
+.section h3{
+  margin:0 0 10px 0;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+  margin-top:8px;
+  box-sizing:border-box;
+  border: 1px solid;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  font-size:15px;
+  cursor:pointer;
+  margin-top:10px;
+}
+
+.primary{background:#2563eb;color:white;}
+.primary:hover{background:#1d4ed8;}
+
+.danger{background:#dc2626;color:white;}
+.danger:hover{background:#b91c1c;}
+
+.theme-toggle{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.switch{
+  width:55px;
+  height:28px;
+  background:#334155;
+  border-radius:50px;
+  position:relative;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.switch::after{
+  content:"";
+  position:absolute;
+  width:22px;
+  height:22px;
+  background:white;
+  border-radius:50%;
+  top:3px;
+  left:3px;
+  transition:.3s;
+}
+
+body.light .switch{
+  background:#22c55e;
+}
+
+body.light .switch::after{
+  left:30px;
+}
+
+.status{
+  font-size:14px;
+  margin-top:8px;
+  color:#22c55e;
+}
+
+/* ===== Popup ===== */
+.popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  visibility:hidden;
+  opacity:0;
+  transition:.3s;
+}
+
+.popup.show{
+  visibility:visible;
+  opacity:1;
+}
+
+.popup-box{
+  background:white;
+  color:black;
+  padding:20px;
+  border-radius:15px;
+  width:85%;
+  max-width:300px;
+  text-align:center;
+}
+
+.popup-box button{
+  margin-top:15px;
+  background:#2563eb;
+  color:white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="theme-toggle">
+    <span>تغییر تم</span>
+    <div class="switch" onclick="toggleTheme()"></div>
+  </div>
+<hr>
+  <h1>تنظیمات امنیتی</h1>
+
+  <div class="section">
+    <h3>رمز متنی</h3>
+    <input type="text" id="textPassword" placeholder="حداقل 6 کاراکتر">
+    <button class="primary" onclick="setPassword()">فعال سازی</button>
+  </div>
+
+  <div class="section">
+    <h3>PIN عددی</h3>
+    <input type="tel" inputmode="numeric" id="pinPassword" placeholder="4 تا 6 رقم">
+    <button class="primary" onclick="setPin()">فعال سازی</button>
+  </div>
+
+  <div class="section">
+    <h3>مدیریت قفل</h3>
+    <button class="danger" onclick="removeLock()">حذف کامل قفل</button>
+    <div id="lockStatus" class="status"></div>
+  </div>
+
+</div>
+
+<!-- Popup -->
+<div class="popup" id="popup">
+  <div class="popup-box">
+    <div id="popupText"></div>
+    <button onclick="closePopup()">باشه</button>
+  </div>
+</div>
+
+<script>
+// ===== Popup =====
+function showPopup(text){
+  document.getElementById("popupText").innerText=text;
+  document.getElementById("popup").classList.add("show");
+}
+function closePopup(){
+  document.getElementById("popup").classList.remove("show");
+}
+
+// ===== Theme =====
+function toggleTheme(){
+  document.body.classList.toggle("light");
+  localStorage.setItem("theme",
+    document.body.classList.contains("light") ? "light":"dark");
+}
+
+(function(){
+  if(localStorage.getItem("theme")==="light"){
+    document.body.classList.add("light");
+  }
+})();
+
+// ===== Status =====
+function updateStatus(){
+  const pass=localStorage.getItem("app_lock_password");
+  const pin=localStorage.getItem("app_lock_pin");
+  const s=document.getElementById("lockStatus");
+
+  if(pass) s.innerText="🔒 قفل فعال: رمز متنی";
+  else if(pin) s.innerText="🔒 قفل فعال: PIN";
+  else s.innerText="هیچ قفلی فعال نیست";
+}
+updateStatus();
+
+// ===== Hash =====
+async function hashPassword(password,salt){
+  const enc=new TextEncoder();
+  const keyMaterial=await crypto.subtle.importKey(
+    "raw",enc.encode(password),{name:"PBKDF2"},false,["deriveBits"]
+  );
+  const bits=await crypto.subtle.deriveBits(
+    {name:"PBKDF2",salt:salt,iterations:310000,hash:"SHA-256"},
+    keyMaterial,256
+  );
+  return Array.from(new Uint8Array(bits))
+  .map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+// ===== Set Password =====
+async function setPassword(){
+  const val=document.getElementById("textPassword").value;
+  if(val.length<6){
+    showPopup("رمز باید حداقل 6 کاراکتر باشد");
+    return;
+  }
+
+  const salt=crypto.getRandomValues(new Uint8Array(16));
+  const hash=await hashPassword(val,salt);
+  const obj={hash:hash,salt:Array.from(salt).join(",")};
+
+  localStorage.removeItem("app_lock_pin");
+  localStorage.setItem("app_lock_password",JSON.stringify(obj));
+
+  document.getElementById("textPassword").value="";
+  showPopup("رمز متنی فعال شد ✅");
+  updateStatus();
+}
+
+// ===== Set PIN =====
+async function setPin(){
+  const val=document.getElementById("pinPassword").value;
+
+  if(!/^\d{4,6}$/.test(val)){
+    showPopup("PIN باید بین 4 تا 6 رقم باشد");
+    return;
+  }
+
+  const salt=crypto.getRandomValues(new Uint8Array(16));
+  const hash=await hashPassword(val,salt);
+  const obj={hash:hash,salt:Array.from(salt).join(",")};
+
+  localStorage.removeItem("app_lock_password");
+  localStorage.setItem("app_lock_pin",JSON.stringify(obj));
+
+  document.getElementById("pinPassword").value="";
+  showPopup("PIN فعال شد ✅");
+  updateStatus();
+}
+
+// ===== Remove Lock =====
+function removeLock(){
+  localStorage.removeItem("app_lock_password");
+  localStorage.removeItem("app_lock_pin");
+  showPopup("قفل حذف شد");
+  updateStatus();
+}
+</script>
+
+</body>
+</html>

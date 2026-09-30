@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../css/all.css">
+    <link rel="stylesheet" href="../style.css">
+    <title>مدیریت پسوردها</title>
+    <script>
+(function () {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "light") {
+        document.documentElement.classList.add("light-theme");
+    }
+})();
+</script>
+    <style>
+/* =========================
+   THEME VARIABLES
+========================= */
+:root {
+    --bg-main: #0f172a;
+    --card-bg: rgba(255, 255, 255, 0.06);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --text-main: #ffffff;
+    --text-muted: #cbd5e1;
+    --input-bg: rgba(255, 255, 255, 0.05);
+    --input-border: rgba(255, 255, 255, 0.3);
+    --popup-bg: #1e293b;
+}
+
+.light-theme {
+    --bg-main: #f3f4f6;
+    --card-bg: rgba(0, 0, 0, 0.04);
+    --card-border: rgba(0, 0, 0, 0.1);
+    --text-main: #111827;
+    --text-muted: #4b5563;
+    --input-bg: rgba(0, 0, 0, 0.05);
+    --input-border: rgba(0, 0, 0, 0.25);
+    --popup-bg: #ffffff;
+}
+
+/* =========================
+   GLOBAL
+========================= */
+body {
+    background: var(--bg-main);
+    color: var(--text-main);
+    font-family: sans-serif;
+    transition: all 0.3s ease;
+}
+
+/* =========================
+   CARDS
+========================= */
+.add-password-card,
+.password-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 12px;
+    color: var(--text-main);
+    transition: all 0.3s ease;
+}
+
+/* =========================
+   INPUTS
+========================= */
+.add-password-card input,
+.password-card input,
+.password-input {
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--input-border);
+    outline: none;
+    font-size: 16px;
+    width: 100%;
+    background: var(--input-bg);
+    color: var(--text-main);
+    margin: 10px 0;
+    transition: all 0.3s ease;
+}
+
+/* =========================
+   PASSWORD NAME & DESCRIPTION
+========================= */
+.password-name {
+    font-weight: bold;
+    font-size: 18px;
+    color: #2563eb;
+}
+
+.password-description {
+    background: var(--input-bg);
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    color: var(--text-main);
+    margin-top: 8px;
+    text-align: right;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.btn {
+    border: none;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: white;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.btn.primary {
+    background: linear-gradient(135deg, #f59e0b, #f97316);
+}
+
+.btn.copy {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+/* =========================
+   SHOW PASSWORD BUTTON
+========================= */
+.show-password-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    margin-left: -30px;
+    padding: 0;
+    position: relative;
+    z-index: 1;
+    color: var(--text-main);
+}
+
+/* =========================
+   PASSWORD CONTAINER + SHOW PASSWORD
+========================= */
+.password-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+
+.password-input {
+    flex: 1; /* پر کردن بقیه فضا */
+    padding: 10px;
+    width: auto;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* =========================
+   AVATAR & INDEX
+========================= */
+.password-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+    color: white;
+    border: 2px solid #2563eb;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+    transition: 0.3s ease;
+}
+
+.password-avatar:hover {
+    transform: scale(1.08);
+}
+
+.password-index {
+    margin-right: auto;
+    font-size: 14px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    padding: 6px 10px;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
+    min-width: 28px;
+    text-align: center;
+}
+
+/* =========================
+   POPUPS
+========================= */
+.popup {
+    position: fixed;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(37, 99, 235, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.5s ease;
+    text-align: center;
+}
+
+.popup.show {
+    bottom: 20px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* =========================
+   MODAL ICON PICKER
+========================= */
+.icon-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.icon-modal-content {
+    background: var(--popup-bg);
+    color: var(--text-main);
+    padding: 20px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 400px;
+    max-height: 70vh;
+    overflow-y: auto;
+    text-align: center;
+    position: relative;
+}
+
+/* =========================
+   ICON GRID
+========================= */
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.icon-grid i,
+.icon-grid img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--input-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-main);
+    object-fit: contain;
+}
+
+.icon-grid i:hover,
+.icon-grid img:hover {
+    background: #2563eb;
+    color: white;
+    transform: scale(1.15);
+}
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="title">مدیریت پسوردها</h1>
+
+        <div class="add-password-card">
+            <input type="text" id="newName" placeholder="نام پسورد">
+            <input type="text" id="newPassword" placeholder="پسورد">
+            <input type="text" id="about" placeholder="توضیحات...(اختیاری)">
+            <div class="btn-row">
+                <button class="btn success" id="addPasswordBtn"><i class="fa-solid fa-floppy-disk"></i>ذخیره
+                    کردن</button>
+                <a style="text-decoration: none;" href="../index.html"><button class="btn success"><i
+                            class="fa-solid fa-home"></i>خانه</button></a>
+            </div>
+        </div>
+
+        <div id="passwordList"></div>
+    </div>
+
+    <div id="copyPopup" class="popup">کپی شد!</div>
+
+    <div id="confirmPopup"
+        style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 9999;">
+        <div
+            style="background: #1e293b; padding: 20px; border-radius: 15px; width: 90%; max-width: 300px; text-align: center; color: white;">
+            <p id="confirmText" style="margin-bottom:20px; font-size:16px;"></p>
+            <div style="display:flex; justify-content:space-between; gap:10px;">
+                <button id="confirmYes" class="btn success" style="flex:1; font-size:14px; padding:6px 0;">بله</button>
+                <button id="confirmNo" class="btn"
+                    style="flex:1; font-size:14px; padding:6px 0; background:gray;">خیر</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="passwordWarningPopup" class="popup">
+        <div class="popup-content">
+            <p>لطفا نام پسورد را وارد کنید.</p>
+        </div>
+    </div>
+
+    <!-- پاپ‌آپ تایید حذف -->
+    <div id="confirmDeletePopup"
+        style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 9999;">
+        <div
+            style="background: #1e293b;padding: 20px;border-radius: 15px;width: 90%;max-width: 300px;text-align: center;color: white;display: flex;justify-content: center;align-items: center;flex-direction: column;">
+            <p id="confirmDeleteText" style="margin-bottom:20px; font-size:16px;"></p>
+            <div style="background: #1e293b;display:flex; justify-content:space-between; gap:10px;">
+                <button id="confirmDeleteYes" class="btn success"
+                    style="flex:1; font-size:14px; padding:6px 0;">بله</button>
+                <button id="confirmDeleteNo" class="btn"
+                    style="flex:1; font-size:14px; padding:6px 0; background:gray;">لغو</button>
+            </div>
+        </div>
+    </div>
+    <!-- Icon Picker Modal -->
+    <div id="iconPickerModal" class="icon-modal">
+        <div class="icon-modal-content">
+
+            <h3>انتخاب آیکن</h3>
+            <p style="text-align:center; font-size:13px; opacity:0.7; margin-bottom:30px;">
+                برای دیدن بقیه آیکن‌ها اسکرول کنید ⬇️
+            </p>
+
+            <div class="icon-category">
+                <h4>شبکه‌های اجتماعی</h4>
+                <hr style="color: white;margin:5px">
+                <div class="icon-grid">
+                    <i class="fa-brands fa-instagram" onclick="selectIcon('fa-brands fa-instagram')"></i>
+                    <i class="fa-brands fa-telegram" onclick="selectIcon('fa-brands fa-telegram')"></i>
+                    <i class="fa-brands fa-whatsapp" onclick="selectIcon('fa-brands fa-whatsapp')"></i>
+                    <i class="fa-brands fa-facebook" onclick="selectIcon('fa-brands fa-facebook')"></i>
+                    <i class="fa-brands fa-twitter" onclick="selectIcon('fa-brands fa-twitter')"></i>
+                    <i class="fa-brands fa-tiktok" onclick="selectIcon('fa-brands fa-tiktok')"></i>
+                    <i class="fa-brands fa-snapchat" onclick="selectIcon('fa-brands fa-snapchat')"></i>
+                    <i class="fa-brands fa-linkedin" onclick="selectIcon('fa-brands fa-linkedin')"></i>
+                    <img src="../image/Bale-Logo-450x450.png"
+                        onclick="selectIcon('../image/Bale-Logo-450x450.png', 'image')">
+
+                    <img src="../image/eitaa-.svg" onclick="selectIcon('../image/eitaa-.svg', 'image')">
+
+                    <img src="../image/Soroush_+_logo.png" onclick="selectIcon('../image/Soroush_+_logo.png', 'image')">
+
+                    <img src="../image/logo-rubika.png" onclick="selectIcon('../image/logo-rubika.png', 'image')">
+                    <img src="../image/Logo_Aparat.png" onclick="selectIcon('../image/Logo_Aparat.png', 'image')" >
+                </div>
+            </div>
+
+            <div class="icon-category">
+                <h4>ایمیل و عمومی</h4>
+                <hr style="color: white;margin:5px">
+                <div class="icon-grid">
+                    <i class="fa-solid fa-envelope" onclick="selectIcon('fa-solid fa-envelope')"></i>
+                    <i class="fa-solid fa-user" onclick="selectIcon('fa-solid fa-user')"></i>
+                    <i class="fa fa-user-circle" onclick="selectIcon('fa-solid fa-user-circle')"></i>
+                    <i class="fa fa-user-plus" onclick="selectIcon('fa-solid fa-user-plus')"></i>
+                    <i class="fa fa-user-secret" onclick="selectIcon('fa-solid fa-user-secret')"></i>
+                    <i class="fa-solid fa-lock" onclick="selectIcon('fa-solid fa-lock')"></i>
+                    <i class="fa-solid fa-key" onclick="selectIcon('fa-solid fa-key')"></i>
+                    <i class="fa-solid fa-globe" onclick="selectIcon('fa-solid fa-globe')"></i>
+                    <i class="fa-solid fa fa-car" onclick="selectIcon('fa-solid fa-car')"></i>
+                    <i class="fa-solid fa fa-book" onclick="selectIcon('fa-solid fa-book')"></i>
+                    <i class="fa-solid fa-flag" onclick="selectIcon('fa-solid fa-flag')"></i>
+                    <img src="../image/Saipa_Logo.png" onclick="selectIcon('../image/Saipa_Logo.png', 'image')">
+                    <img src="../image/Iran_Khodro_symbol.svg.png" onclick="selectIcon('../image/Iran_Khodro_symbol.svg.png','image')">
+                </div>
+            </div>
+
+            <div class="icon-category">
+                <h4>گوگل و مایکروسافت</h4>
+                <hr style="color: white;margin:5px">
+                <div class="icon-grid">
+                    <i class="fa-brands fa-google" onclick="selectIcon('fa-brands fa-google')"></i>
+                    <i class="fa-brands fa-google-drive" onclick="selectIcon('fa-brands fa-google-drive')"></i>
+                    <i class="fa-brands fa-youtube" onclick="selectIcon('fa-brands fa-youtube')"></i>
+                    <i class="fa-brands fa-microsoft" onclick="selectIcon('fa-brands fa-microsoft')"></i>
+                    <i class="fa-brands fa-skype" onclick="selectIcon('fa-brands fa-skype')"></i>
+                </div>
+            </div>
+
+            <div class="icon-category">
+                <h4>برنامه‌نویسی و تکنولوژی</h4>
+                <hr style="color: white;margin:5px">
+                <div class="icon-grid">
+                    <i class="fa-brands fa-github" onclick="selectIcon('fa-brands fa-github')"></i>
+                    <i class="fa-brands fa-gitlab" onclick="selectIcon('fa-brands fa-gitlab')"></i>
+                    <i class="fa-brands fa-bitcoin" onclick="selectIcon('fa-brands fa-bitcoin')"></i>
+                    <i class="fa-solid fa-credit-card" onclick="selectIcon('fa-solid fa-credit-card')"></i>
+                    <i class="fa-solid fa-building-columns" onclick="selectIcon('fa-solid fa-building-columns')"></i>
+                </div>
+            </div>
+            <button class="btn" onclick="closeIconModal()" style="margin-top:15px;background:gray;">
+                لغو
+            </button>
+        </div>
+    </div>
+    <script>
+        window.addEventListener('load', function () {
+            const tempPassword = localStorage.getItem('temp_pass');
+            if (tempPassword) {
+                document.getElementById('newPassword').value = tempPassword;
+                localStorage.removeItem('temp_pass');
+            }
+
+            const fromPasswordPage = localStorage.getItem('fromPasswordPage');
+            if (fromPasswordPage === 'true') {
+                document.getElementById('passwordWarningPopup').classList.add('show');
+                localStorage.removeItem('fromPasswordPage');
+                setTimeout(() => {
+                    document.getElementById('passwordWarningPopup').classList.remove('show');
+                }, 3000);
+            }
+        });
+
+        const passwordList = document.getElementById('passwordList');
+        const copyPopup = document.getElementById('copyPopup');
+        const addBtn = document.getElementById('addPasswordBtn');
+
+        let savedPasswords = JSON.parse(localStorage.getItem('savedPasswords') || '[]');
+        let selectedIconClass = "fa-solid fa-globe";
+        let currentEditIndex = null;
+        let passwordToDelete = null;
+
+        /* ================= RENDER ================= */
+        function renderPasswords() {
+            passwordList.innerHTML = '';
+
+            if (savedPasswords.length === 0) {
+                passwordList.innerHTML = '<p style="color:white;text-align:center;">هیچ پسوردی ذخیره نشده است!</p>';
+                return;
+            }
+
+            savedPasswords.forEach((item, index) => {
+                const iconClass = item.icon || "fa-solid fa-globe";
+
+                const card = document.createElement('div');
+                card.classList.add('card', 'password-card');
+
+                card.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div class="password-avatar" onclick="openIconPicker(${index})">
+            ${item.icon && item.icon.startsWith('../image/')
+                        ? `<img src="${item.icon}" style="width:60%;height:60%;object-fit:contain;">`
+                        : `<i class="${item.icon || 'fa-solid fa-globe'}"></i>`
+                    }
+        </div>
+        <div class="password-name" onclick="copypasswordname('${item.name}')">
+            ${item.name}
+        </div>
+        <div class="password-index">${index + 1}</div>
+    </div>
+
+
+         <div class="password-container" style="width:90%">
+            <input type="${item.isPasswordVisible ? 'text' : 'password'}"
+            id="password-${index}"
+            value="${item.password}"
+            readonly
+            class="password-input">
+            <button class="show-password-btn" onclick="togglePasswordVisibility(${index})">
+                <i class="fa-solid fa-eye${item.isPasswordVisible ? '' : '-slash'}" style="padding:10px"></i>
+            </button>
+
+</div>
+
+            ${item.description ? `<div class="password-description">${item.description}</div>` : ''}
+
+            <div class="btn-row" style="gap:6px;display:flex">
+                <button class="btn copy" onclick="copyPassword(${index})" style="flex:1">
+                    <i class="fa-solid fa-copy"></i>
+                </button>
+
+                <button class="btn primary" onclick="startEdit(${index})" style="flex:1">
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+
+                <button class="btn"
+                    onclick="deletePassword(${index})"
+                    style="flex:1;background:linear-gradient(135deg,#f87171,#b91c1c);">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        `;
+
+                passwordList.appendChild(card);
+            });
+        }
+
+        /* ================= ICON ================= */
+
+        function openIconPicker(index = null) {
+            currentEditIndex = index;
+            document.getElementById("iconPickerModal").style.display = "flex";
+        }
+        let selectedIconType = "font";
+        function selectIcon(value, type = 'font') {
+            selectedIconClass = value;
+            selectedIconType = type;
+            closeIconModal();
+
+            if (currentEditIndex === null) {
+                const name = document.getElementById('newName').value.trim();
+                const password = document.getElementById('newPassword').value.trim();
+                const description = document.getElementById('about').value.trim();
+
+                savedPasswords.push({
+                    name,
+                    password,
+                    description,
+                    icon: selectedIconClass,
+                    iconType: selectedIconType,
+                    isPasswordVisible: false
+                });
+
+                document.getElementById('newName').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('about').value = '';
+
+            } else {
+                savedPasswords[currentEditIndex].icon = selectedIconClass;
+                savedPasswords[currentEditIndex].iconType = selectedIconType;
+            }
+
+            localStorage.setItem('savedPasswords', JSON.stringify(savedPasswords));
+            renderPasswords();
+        }
+
+        function closeIconModal() {
+            document.getElementById("iconPickerModal").style.display = "none";
+        }
+
+        /* ================= ADD ================= */
+
+        addBtn.addEventListener('click', () => {
+            const name = document.getElementById('newName').value.trim();
+            const password = document.getElementById('newPassword').value.trim();
+
+            if (!name || !password) {
+                showPopup("نام و پسورد نباید خالی باشد!");
+                return;
+            }
+
+            currentEditIndex = null;
+            openIconPicker();
+        });
+
+        /* ================= EDIT ================= */
+
+        function startEdit(index) {
+            const card = passwordList.children[index];
+            const item = savedPasswords[index];
+
+            card.innerHTML = `
+        <div class="inline-edit">
+            <input type="text" id="editName-${index}" value="${item.name}">
+            <input type="text" id="editPassword-${index}" value="${item.password}">
+            <input type="text" id="editDescription-${index}" value="${item.description || ''}">
+            <div class="btn-row">
+                <button class="btn success" onclick="saveEdit(${index})">
+                    <i class="fa-solid fa-check"></i> ذخیره
+                </button>
+                <button class="btn" style="background:gray;" onclick="cancelEdit()">
+                    <i class="fa-solid fa-times"></i> لغو
+                </button>
+            </div>
+        </div>
+    `;
+        }
+
+        function saveEdit(index) {
+            const newName = document.getElementById(`editName-${index}`).value.trim();
+            const newPassword = document.getElementById(`editPassword-${index}`).value.trim();
+            const newDescription = document.getElementById(`editDescription-${index}`).value.trim();
+
+            if (!newName || !newPassword) {
+                showPopup("نام و پسورد نباید خالی باشد!");
+                return;
+            }
+
+            savedPasswords[index] = {
+                ...savedPasswords[index],
+                name: newName,
+                password: newPassword,
+                description: newDescription
+            };
+
+            localStorage.setItem('savedPasswords', JSON.stringify(savedPasswords));
+            renderPasswords();
+        }
+
+        function cancelEdit() {
+            renderPasswords();
+        }
+
+        /* ================= OTHER ================= */
+
+        function togglePasswordVisibility(index) {
+            const input = document.getElementById(`password-${index}`);
+            const isVisible = input.type === 'text';
+
+            input.type = isVisible ? 'password' : 'text';
+            savedPasswords[index].isPasswordVisible = !isVisible;
+
+            localStorage.setItem('savedPasswords', JSON.stringify(savedPasswords));
+            renderPasswords();
+        }
+
+        function copyPassword(index) {
+            navigator.clipboard.writeText(savedPasswords[index].password).then(() => {
+                copyPopup.classList.add('show');
+                setTimeout(() => copyPopup.classList.remove('show'), 2000);
+            });
+        }
+
+        function copypasswordname(value) {
+            navigator.clipboard.writeText(value).then(() => {
+                copyPopup.classList.add('show');
+                setTimeout(() => copyPopup.classList.remove('show'), 2000);
+            });
+        }
+
+        function deletePassword(index) {
+            passwordToDelete = index;
+            document.getElementById('confirmDeleteText').innerText =
+                `آیا شما میخواهید "${savedPasswords[index].name}" را پاک کنید؟`;
+            document.getElementById('confirmDeletePopup').style.display = 'flex';
+        }
+
+        function confirmDelete() {
+            if (passwordToDelete !== null) {
+                savedPasswords.splice(passwordToDelete, 1);
+                localStorage.setItem('savedPasswords', JSON.stringify(savedPasswords));
+                renderPasswords();
+            }
+            closeConfirmDeletePopup();
+        }
+
+        function closeConfirmDeletePopup() {
+            document.getElementById('confirmDeletePopup').style.display = 'none';
+        }
+
+        document.getElementById('confirmDeleteYes').addEventListener('click', confirmDelete);
+        document.getElementById('confirmDeleteNo').addEventListener('click', closeConfirmDeletePopup);
+
+        /* ================= INIT ================= */
+       function reApplyTheme() {
+    const currentTheme = localStorage.getItem("theme");
+
+    if (currentTheme === "light") {
+        document.documentElement.classList.add("light-theme");
+    } else {
+        document.documentElement.classList.remove("light-theme");
+    }
+}
+        savedPasswords = savedPasswords.map(item => ({
+            ...item,
+            isPasswordVisible: false
+        }));
+        // بستن modal وقتی کاربر روی بک‌گراند کلیک کنه
+        const iconModal = document.getElementById("iconPickerModal");
+        iconModal.addEventListener('click', function (e) {
+            if (e.target === iconModal) {
+                closeIconModal();
+            }
+        });
+
+        // تابع قبلی بستن modal
+        function closeIconModal() {
+            document.getElementById("iconPickerModal").style.display = "none";
+        }
+        localStorage.setItem('savedPasswords', JSON.stringify(savedPasswords));
+        renderPasswords();
+    </script>

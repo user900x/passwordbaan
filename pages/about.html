@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="../css/all.css">
+    <script src="../theme.js"></script>
+    <style>
+        /* استایل اصلی */
+        .about-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);  /* پس‌زمینه شفاف‌تر */
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            color: white;  /* رنگ متن سفید */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin-top: 30px;
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 80vh; /* برای قرار دادن عکس در پایین */
+        }
+
+        /* عنوان */
+        .about-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #ffffff;  /* رنگ سفید برای عنوان */
+            margin-bottom: 20px;
+        }
+
+        /* متن توضیحات */
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* تصویر پروفایل */
+        .about-img {
+            width: 300px;
+            border-radius: 100px;
+            margin: 0 auto;
+            display: block;
+            margin-top: 30px; /* فاصله از متن */
+        }
+
+        /* استایل برای تم روشن */
+        .light-theme .about-container {
+            color: black;  /* رنگ متن برای تم روشن */
+            background: rgba(255, 255, 255, 0.9);  /* پس‌زمینه سفید روشن‌تر */
+        }
+
+        .light-theme .about-title {
+            color: #333;  /* رنگ عنوان در تم روشن */
+        }
+
+        .light-theme .about-text {
+            color: #333;  /* رنگ متن در تم روشن */
+        }
+
+        /* استایل برای تم تاریک */
+        .dark-theme .about-container {
+            color: white;  /* رنگ متن برای تم تاریک */
+            background: rgba(0, 0, 0, 0.7);  /* پس‌زمینه تیره‌تر */
+        }
+
+        .dark-theme .about-title {
+            color: #fff;  /* رنگ عنوان در تم تاریک */
+        }
+
+        .dark-theme .about-text {
+            color: #ddd;  /* رنگ متن در تم تاریک */
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div class="about-container" style="text-align: center;">
+            <div class="about-title">درباره برنامه</div>
+
+            <div class="about-text">
+                پسوردبان برنامه ای کاملا آفلاین هست
+                و اطلاعات شما در هیچ جایی بجز موبایل شما ذخیره نمی شود
+            </div>
+
+            <div class="about-text">
+                این برنامه هیچ‌گونه تبلیغاتی ندارد و هیچ راه درآمدی برای توسعه‌دهندگان در نظر گرفته نشده است. هدف ما این است که شما به راحتی و بدون محدودیت از برنامه استفاده کنید
+                برای ادامه کار و ساخت برنامه های بیشتر میتوانید من را
+            </div>
+
+            <!-- لینک که در یک صفحه جدید باز می‌شود -->
+            <a href="https://www.coffeebede.com/username900" id="openInBrowser">
+                <img class="about-img" src="../image/default-yellow.svg" alt="Banner Image"/>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // کد جاوااسکریپت برای باز کردن لینک در مرورگر پیش‌فرض
+        document.getElementById('openInBrowser').addEventListener('click', function(e) {
+            e.preventDefault();  // جلوگیری از باز شدن لینک در WebView
+            var url = this.href;
+            window.open(url, '_system');  // باز کردن لینک در مرورگر پیش‌فرض
+        });
+    </script>
+</body>
+</html>
